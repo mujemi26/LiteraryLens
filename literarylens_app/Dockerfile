@@ -5,7 +5,7 @@ FROM node:23
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json (if present)
-COPY package.json ./
+COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm install
@@ -15,6 +15,10 @@ COPY . .
 
 # Expose the port your app runs on
 EXPOSE 3000
+
+# Set environment variable to prevent OpenSSL errors
+ENV NODE_OPTIONS=--openssl-legacy-provider
+ENV PORT=3000
 
 # Start the app
 CMD ["node", "app.js"]

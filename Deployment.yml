@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ls-app
+  labels:
+    app: ls
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ls
+  template:
+    metadata:
+      labels:
+        app: ls
+    spec:
+      containers:
+      - name: literarylens-container
+        image: mujimmy/ls:latest  # Replace with your Docker image
+        ports:
+        - containerPort: 3000  # Replace with the port your app runs on

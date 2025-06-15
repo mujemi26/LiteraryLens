@@ -1,0 +1,112 @@
+(without K8S Stage)
+pipeline {
+    agent any
+    tools {
+        jdk 'jdk17'
+        nodejs 'Node23'
+    }
+    environment {
+        SCANNER_HOME = tool 'Sonar-Scanner'
+    }
+    stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('Checkout from Git') {
+            steps {
+                git branch: 'master', url: 'https://github.com/mujemi26/LiteraryLens.git'
+                sh 'ls -la'  // Verify files after checkout
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('sonar-server') {
+                    sh ''' 
+                    $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=LS \
+                    -Dsonar.projectKey=LS 
+                    '''
+                }
+            }
+        }
+        stage('Quality Gate') {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token'
+                }
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                cd literarylens_app
+                ls -la  # Verify package.json exists
+                if [ -f package.json ]; then
+                    rm -rf node_modules package-lock.json  # Remove old dependencies
+                    npm install  # Install fresh dependencies
+                else
+                    echo "Error: package.json not found in literarylens_app!"
+                    exit 1
+                fi
+                '''
+            }
+        }
+        stage('OWASP FS Scan') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+        stage('Trivy FS Scan') {
+            steps {
+                sh 'trivy fs . > trivyfs.txt'
+            }
+        }
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker', toolName: 'Docker') {
+                        sh ''' 
+                        echo "Building Docker image..."
+                        docker build --no-cache -t mujimmy/ls:latest -f literarylens_app/Dockerfile literarylens_app
+
+                        echo "Pushing Docker image to registry..."
+                        docker push mujimmy/ls:latest
+                        '''
+                    }
+                }
+            }
+        }
+        stage('Deploy to Container') {
+            steps {
+                sh ''' 
+                echo "Stopping and removing old container..."
+                docker stop ls || true
+                docker rm ls || true
+
+                echo "Running new container on port 3000..."
+                docker run -d --restart=always --name ls -p 3000:3000 mujimmy/ls:latest
+
+                echo "Checking running containers..."
+                docker ps -a
+
+                echo "Fetching logs..."
+                sleep 5  # Give time for the app to start
+                docker logs bms
+                '''
+            }
+        }
+    }
+    post {
+        always {
+            emailext attachLog: true,
+                subject: "'${currentBuild.result}'",
+                body: "Project: ${env.JOB_NAME}<br/>" +
+                      "Build Number: ${env.BUILD_NUMBER}<br/>" +
+                      "URL: ${env.BUILD_URL}<br/>",
+                to: 'mgghatory@gmail.com',
+                attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
+        }
+    }
+}

@@ -1,0 +1,2728 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LiteraryLens - Book Ratings & Feedback</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #6366f1;
+        --secondary-color: #ec4899;
+        --background-color: #181a20;
+        --glass-bg: rgba(36, 37, 42, 0.7);
+        --border-color: rgba(99, 102, 241, 0.18);
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+      body,
+      html {
+        background: #181a20 !important;
+        color: #e5e7eb !important;
+        font-family: "Inter", "Montserrat", "Poppins", sans-serif;
+        transition: background 0.5s, color 0.5s;
+      }
+      body.light-mode {
+        background: #f3f4f6;
+        color: #1a202c;
+      }
+
+      #scroll-progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        width: 0%;
+        z-index: 9999;
+        transition: width 0.1s ease-out;
+      }
+
+      /* Glassmorphism & Neumorphism */
+      .neumorph {
+        background: linear-gradient(120deg, #181c24 60%, #23263a 100%);
+        border-radius: 1.5rem;
+        box-shadow: 8px 8px 32px #0e1013, -8px -8px 32px #23263a;
+        border: 1.5px solid rgba(99, 102, 241, 0.1);
+        transition: background 0.5s, box-shadow 0.5s;
+      }
+      .glass-effect,
+      .modal-content {
+        background: linear-gradient(
+          120deg,
+          rgba(36, 37, 42, 0.85) 60%,
+          rgba(99, 102, 241, 0.12) 100%
+        );
+        border: 1.5px solid var(--border-color);
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 40px 0 rgba(36, 37, 42, 0.45),
+          0 1.5px 8px 0 rgba(99, 102, 241, 0.12);
+        backdrop-filter: blur(24px) saturate(140%);
+        -webkit-backdrop-filter: blur(24px) saturate(140%);
+        transition: background 0.5s, box-shadow 0.5s;
+      }
+      /* Light mode */
+      body.light-mode .glass-effect {
+        background: rgba(255, 255, 255, 0.7);
+        color: #22223b;
+      }
+      body.light-mode .neumorph {
+        background: #fff;
+        box-shadow: 8px 8px 24px #e0e0e0, -8px -8px 24px #fff;
+      }
+      /* Animated gradient background */
+      .animated-bg,
+      .hero-background {
+        background: linear-gradient(
+          270deg,
+          #23263a,
+          #6366f1,
+          #23263a,
+          #ec4899,
+          #23263a
+        );
+        background-size: 1200% 1200%;
+        animation: gradientMove 24s ease-in-out infinite;
+      }
+      @keyframes gradientMove {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .page {
+        display: none;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      .page.active {
+        display: block;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .hero-section {
+        border-radius: 2rem;
+        box-shadow: 0 12px 48px 0 rgba(36, 37, 42, 0.55);
+        border: 2px solid var(--border-color);
+        overflow: hidden;
+        position: relative;
+        background: linear-gradient(120deg, #23263a 60%, #6366f1 100%);
+        transition: background 0.5s;
+      }
+      .hero-section::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 2rem;
+        pointer-events: none;
+        border: 2px solid transparent;
+        background: linear-gradient(120deg, #6366f1, #ec4899, #06b6d4, #23263a)
+          border-box;
+        mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+        mask-composite: exclude;
+        opacity: 0.18;
+        z-index: 1;
+      }
+      .hero-section .text-6xl,
+      .hero-section .text-7xl,
+      .hero-section .text-8xl {
+        font-family: "Montserrat", "Poppins", sans-serif;
+        letter-spacing: -0.03em;
+      }
+      .hero-section .text-xl,
+      .hero-section .text-2xl {
+        color: #e0e7ef;
+      }
+      .hero-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        /* Remove static image and use dynamic animated gradient */
+        background: linear-gradient(120deg, #4f46e5 0%, #ec4899 100%);
+        background-size: 200% 200%;
+        animation: heroGradientMove 10s ease-in-out infinite;
+        z-index: -2;
+      }
+      @keyframes heroGradientMove {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .glowing-blob {
+        position: fixed;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          var(--primary-color) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+        filter: blur(100px);
+        opacity: 0.3;
+        pointer-events: none;
+        z-index: -10;
+        transition: transform 0.2s ease-out;
+      }
+      .glowing-blob.secondary {
+        background: radial-gradient(
+          circle,
+          var(--secondary-color) 0%,
+          transparent 70%
+        );
+        width: 400px;
+        height: 400px;
+      }
+
+      #top-books-section {
+        padding: 5rem 0;
+        position: relative;
+      }
+      #top-books-outer-container {
+        position: relative;
+      }
+      #top-books-container {
+        display: flex;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        padding: 2rem 5vw;
+        gap: 2.5rem;
+        cursor: grab;
+        user-select: none;
+      }
+      #top-books-container::-webkit-scrollbar {
+        display: none;
+      }
+      #top-books-container.active-drag {
+        cursor: grabbing;
+      }
+
+      .scroll-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 20;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: none; /* Hidden on small screens */
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        cursor: pointer;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, background 0.3s ease;
+      }
+      @media (min-width: 768px) {
+        .scroll-arrow {
+          display: flex;
+        }
+      }
+      #top-books-outer-container:hover .scroll-arrow {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .scroll-arrow.left {
+        left: 20px;
+      }
+      .scroll-arrow.right {
+        right: 20px;
+      }
+      .scroll-gradient {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100px;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      .scroll-gradient.left {
+        left: 0;
+        background: linear-gradient(
+          to right,
+          var(--background-color),
+          transparent
+        );
+      }
+      .scroll-gradient.right {
+        right: 0;
+        background: linear-gradient(
+          to left,
+          var(--background-color),
+          transparent
+        );
+      }
+
+      .book-card {
+        flex: 0 0 300px;
+        width: 300px;
+        height: 450px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+          box-shadow 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        transform-style: preserve-3d;
+      }
+      .book-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+      }
+      .book-card::before,
+      .book-card::after {
+        content: "";
+        position: absolute;
+        border-radius: 1rem;
+        transition: opacity 0.6s ease, transform 0.6s ease;
+        z-index: 1;
+      }
+      .book-card::before {
+        inset: -2px;
+        background: linear-gradient(
+          120deg,
+          var(--primary-color),
+          var(--secondary-color),
+          var(--primary-color)
+        );
+        background-size: 200% 200%;
+        opacity: 0;
+        animation: gradient-animation 4s infinite;
+      }
+      .book-card::after {
+        inset: 0;
+        background: linear-gradient(
+          to right,
+          transparent 0%,
+          rgba(255, 255, 255, 0.1) 50%,
+          transparent 100%
+        );
+        transform: translateX(-100%) skew(-20deg);
+        pointer-events: none;
+      }
+      .book-card:hover::before {
+        opacity: 1;
+      }
+      .book-card:hover::after {
+        transform: translateX(100%) skew(-20deg);
+        transition-duration: 0.8s;
+      }
+      .book-card-details {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.95), transparent);
+        padding: 2rem 1rem 1rem;
+        transform: translateY(100%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1) 0.1s,
+          opacity 0.4s ease 0.1s;
+        z-index: 2;
+      }
+      .book-card:hover .book-card-details,
+      .book-card:focus-within .book-card-details {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+        transition-delay: 0s, 0s;
+      }
+      .testimonial-card {
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.4s ease, box-shadow 0.4s ease,
+          background 0.4s ease;
+      }
+      .testimonial-card .avatar-glow {
+        border-radius: 50%;
+        transition: box-shadow 0.4s ease;
+      }
+      .testimonial-card::before {
+        content: "\f10d";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        position: absolute;
+        top: 0.5rem;
+        right: 1rem;
+        font-size: 8rem;
+        color: rgba(255, 255, 255, 0.03);
+        z-index: 0;
+        transition: transform 0.4s ease, color 0.4s ease;
+      }
+      .testimonial-card:hover {
+        transform: translateY(-12px) scale(1.04);
+        box-shadow: 0 25px 40px -15px rgba(0, 0, 0, 0.4);
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .testimonial-card:hover::before {
+        transform: scale(1.1) rotate(-5deg);
+        color: rgba(255, 255, 255, 0.08);
+      }
+      .testimonial-card:hover .avatar-glow {
+        box-shadow: 0 0 20px 4px var(--secondary-color);
+        animation: pulse 1.5s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 20px 4px var(--secondary-color);
+        }
+        50% {
+          box-shadow: 0 0 25px 8px var(--secondary-color);
+        }
+        100% {
+          box-shadow: 0 0 20px 4px var(--secondary-color);
+        }
+      }
+
+      .animated-text-gradient {
+        background: linear-gradient(
+          90deg,
+          var(--primary-color),
+          var(--secondary-color),
+          var(--primary-color)
+        );
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradient-animation 5s ease infinite;
+      }
+      @keyframes gradient-animation {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .reveal-text-container {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+      }
+      .reveal-text-container > span {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(100%);
+        animation: reveal-char 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+      }
+
+      @keyframes reveal-char {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .main-nav a {
+        position: relative;
+        transition: color 0.3s;
+      }
+      .main-nav a::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -4px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--secondary-color);
+        transition: width 0.3s ease;
+      }
+      .main-nav a:hover {
+        color: #f3f4f6;
+      }
+      .main-nav a:hover::after {
+        width: 100%;
+      }
+
+      .rating-stars input[type="radio"] {
+        display: none;
+      }
+      .rating-stars label {
+        font-size: 2rem;
+        color: #4b5563;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+      .rating-stars input[type="radio"]:checked ~ label,
+      .rating-stars label:hover,
+      .rating-stars label:hover ~ label {
+        color: var(--secondary-color);
+      }
+
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(17, 24, 39, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+      .modal-overlay.visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      .modal-content {
+        width: 100%;
+        max-width: 500px;
+        padding: 2rem;
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+      }
+      .modal-overlay.visible .modal-content {
+        transform: scale(1);
+      }
+
+      .auth-page {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        perspective: 1000px;
+      }
+      .auth-form-container {
+        width: 100%;
+        max-width: 420px;
+        transform-style: preserve-3d;
+        transition: transform 0.5s;
+      }
+      .auth-form-container:hover {
+        transform: rotateY(5deg) rotateX(2deg);
+      }
+
+      #mobile-menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1001;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        transform: translateY(-100%);
+        transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      }
+      #mobile-menu.open {
+        transform: translateY(0);
+      }
+      #mobile-menu a {
+        font-size: 2rem;
+        font-weight: 600;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+      }
+      #mobile-menu.open a {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      #close-menu-btn {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        font-size: 2rem;
+      }
+
+      #transition-clone {
+        position: fixed;
+        z-index: 9999;
+        pointer-events: none;
+        transition: all 0.6s cubic-bezier(0.6, 0.02, 0.2, 1);
+      }
+
+      /* Loader overlay styles */
+      #fancy-loader {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(120deg, #23263a 60%, #6366f1 100%);
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+        pointer-events: all;
+        transition: opacity 0.8s cubic-bezier(0.77, 0, 0.18, 1),
+          visibility 0.8s cubic-bezier(0.77, 0, 0.18, 1);
+        visibility: visible;
+      }
+      #fancy-loader.hide {
+        opacity: 0;
+        pointer-events: none;
+        visibility: hidden;
+      }
+      .loader-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+      }
+      .loader-logo {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 40px 0 rgba(99, 102, 241, 0.25);
+        animation: loaderPulse 1.6s infinite alternate
+          cubic-bezier(0.77, 0, 0.18, 1);
+      }
+      .loader-logo i {
+        font-size: 2.5rem;
+        color: #fff;
+        filter: drop-shadow(0 2px 8px #ec4899);
+      }
+      .loader-bar {
+        width: 120px;
+        height: 6px;
+        border-radius: 3px;
+        background: linear-gradient(90deg, #6366f1 0%, #ec4899 100%);
+        overflow: hidden;
+        position: relative;
+      }
+      .loader-bar-inner {
+        position: absolute;
+        left: -60px;
+        top: 0;
+        width: 60px;
+        height: 100%;
+        background: #fff;
+        border-radius: 3px;
+        opacity: 0.7;
+        animation: loaderBarMove 1.2s infinite linear;
+      }
+      @keyframes loaderPulse {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 8px 40px 0 rgba(99, 102, 241, 0.25);
+        }
+        100% {
+          transform: scale(1.12);
+          box-shadow: 0 16px 60px 0 rgba(236, 72, 153, 0.18);
+        }
+      }
+      @keyframes loaderBarMove {
+        0% {
+          left: -60px;
+        }
+        100% {
+          left: 120px;
+        }
+      }
+
+      /* SVG Divider for animated section separation */
+      #svg-divider-1 {
+        margin-bottom: -2px;
+      }
+
+      /* Floating Action Button */
+      #fab {
+        position: fixed;
+        bottom: 8px;
+        right: 8px;
+        z-index: 50;
+        background-color: var(--secondary-color);
+        color: white;
+        border-radius: 50%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        padding: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s ease;
+      }
+      #fab:hover {
+        transform: translateY(-2px);
+      }
+      .fab-animate {
+        transition: box-shadow 0.3s, background 0.3s, transform 0.2s;
+      }
+      .fab-animate:active {
+        transform: scale(0.95);
+      }
+      @keyframes avatarGlow {
+        0% {
+          box-shadow: 0 0 0 0 #6366f1;
+        }
+        50% {
+          box-shadow: 0 0 16px 4px #ec4899;
+        }
+        100% {
+          box-shadow: 0 0 0 0 #6366f1;
+        }
+      }
+      .animate-avatar-glow {
+        animation: avatarGlow 2s infinite;
+      }
+      @keyframes progressBar {
+        from {
+          stroke-dashoffset: 125.6;
+        }
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+      .progress-bar {
+        transition: stroke-dashoffset 1s cubic-bezier(0.77, 0, 0.18, 1);
+      }
+      /* Easter Egg: snow/confetti */
+      .easter-egg-snow {
+        pointer-events: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 99998;
+        pointer-events: none;
+      }
+      /* Book Flip Animation */
+      .book-card.flip {
+        transform: rotateY(180deg) !important;
+        transition: transform 0.7s cubic-bezier(0.77, 0, 0.18, 1);
+      }
+      .book-card .book-card-back {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #23263a;
+        color: #fff;
+        z-index: 3;
+        padding: 2rem 1rem 1rem;
+        border-radius: 1rem;
+        backface-visibility: hidden;
+        transform: rotateY(180deg);
+      }
+      .book-card.flip .book-card-details {
+        display: none;
+      }
+      .book-card.flip .book-card-back {
+        display: block;
+      }
+      /* Book Shelf Animation */
+      #top-books-container.shelf {
+        display: flex;
+        align-items: flex-end;
+        gap: 2.5rem;
+        padding-bottom: 2rem;
+        background: linear-gradient(0deg, #23263a 80%, transparent 100%);
+        border-radius: 2rem 2rem 0 0;
+        box-shadow: 0 8px 40px 0 rgba(36, 37, 42, 0.25);
+        position: relative;
+      }
+      #top-books-container.shelf::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 16px;
+        background: #6366f1;
+        border-radius: 0 0 1rem 1rem;
+        box-shadow: 0 2px 8px #23263a;
+        z-index: 2;
+      }
+      /* Live Search Suggestions */
+      #search-suggestions li {
+        padding: 0.75rem 1.25rem;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      #search-suggestions li:hover {
+        background: #f3f4f6;
+      }
+      /* Progress Circle Animation */
+      .progress-bar.animated {
+        animation: progressBar 1.2s cubic-bezier(0.77, 0, 0.18, 1) forwards;
+      }
+      /* Animated SVG Divider */
+      #svg-divider-1 path {
+        transition: d 1.2s cubic-bezier(0.77, 0, 0.18, 1);
+      }
+      /* Standard background-clip for compatibility */
+      .animated-text-gradient {
+        background-clip: text;
+      }
+      /* Miscellaneous */
+      #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+      }
+      #page-container {
+        position: relative;
+        z-index: 10;
+      }
+      #main-navbar {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      #mobile-menu {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      /* Dark mode adjustments */
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --primary-color: #4f46e5;
+          --secondary-color: #ec4899;
+          --background-color: #181a20;
+          --glass-bg: rgba(36, 37, 42, 0.7);
+          --border-color: rgba(99, 102, 241, 0.18);
+        }
+        body {
+          background-color: #181a20;
+          color: #e5e7eb;
+        }
+        .glass-effect {
+          background: rgba(36, 37, 42, 0.85);
+        }
+        .neumorph {
+          background: linear-gradient(120deg, #181c24 60%, #23263a 100%);
+          border: 1.5px solid rgba(99, 102, 241, 0.1);
+        }
+        /* Scrollbar for dark mode */
+        ::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+          background-color: #6366f1;
+          border-radius: 10px;
+        }
+        ::-webkit-scrollbar-track {
+          background-color: #181a20;
+        }
+      }
+      /* Light mode adjustments */
+      @media (prefers-color-scheme: light) {
+        :root {
+          --primary-color: #6366f1;
+          --secondary-color: #ec4899;
+          --background-color: #f3f4f6;
+          --glass-bg: rgba(255, 255, 255, 0.7);
+          --border-color: rgba(99, 102, 241, 0.18);
+        }
+        body {
+          background-color: #f3f4f6;
+          color: #1a202c;
+        }
+        .glass-effect {
+          background: rgba(255, 255, 255, 0.9);
+        }
+        .neumorph {
+          background: #fff;
+          border: 1.5px solid rgba(99, 102, 241, 0.1);
+        }
+        /* Scrollbar for light mode */
+        ::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+          background-color: #6366f1;
+          border-radius: 10px;
+        }
+        ::-webkit-scrollbar-track {
+          background-color: #f3f4f6;
+        }
+      }
+
+      /* Miscellaneous */
+      #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+      }
+      #page-container {
+        position: relative;
+        z-index: 10;
+      }
+      #main-navbar {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      #mobile-menu {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      /* Search lens button */
+      #lens-search-btn {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: transform 0.3s, background-color 0.3s;
+        z-index: 10;
+      }
+      #lens-search-btn:hover {
+        transform: scale(1.1);
+        background-color: var(--secondary-color);
+      }
+      #lens-search-btn:active {
+        transform: scale(0.95);
+      }
+
+      /* --- ENHANCED SEARCH BAR STYLES --- */
+      
+      /* Glowing border animation */
+      @keyframes border-glow {
+        0% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
+        50% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.4); }
+        100% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
+      }
+
+      /* Global Search Overlay */
+      #lens-search-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 9999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+        padding-top: 15vh;
+      }
+      #lens-search-overlay.visible {
+        opacity: 1;
+        pointer-events: all;
+      }
+      #lens-search-box {
+        position: relative;
+        background: rgba(25, 27, 34, 0.8); /* Darker, less transparent */
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        border: 1px solid var(--border-color);
+        backdrop-filter: blur(20px);
+        width: 90%;
+        max-width: 600px;
+        transform: translateY(-120%) scale(0.95);
+        opacity: 0;
+        transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+          opacity 0.4s ease;
+      }
+      #lens-search-overlay.visible #lens-search-box {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        animation: border-glow 2.5s ease-in-out infinite; /* Add glowing effect */
+      }
+      #lens-search-box .close-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        color: #fff;
+        cursor: pointer;
+        font-size: 1.5rem;
+        transition: color 0.3s, transform 0.3s;
+      }
+      #lens-search-box .close-btn:hover {
+        color: var(--secondary-color);
+        transform: rotate(90deg);
+      }
+      
+      #lens-search-input {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        border: 1px solid transparent;
+        border-radius: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 1.2rem;
+        outline: none;
+        transition: background 0.3s, border-color 0.3s;
+      }
+      #lens-search-input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+      #lens-search-input:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: var(--primary-color);
+      }
+      #lens-search-results {
+        margin-top: 1rem;
+        max-height: 300px;
+        overflow-y: auto;
+        padding-right: 0.5rem; /* Space for scrollbar */
+      }
+      
+      /* NEW: Styles for enhanced search results */
+      .search-result-item {
+          list-style: none;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 0.75rem;
+          border-radius: 0.75rem;
+          cursor: pointer;
+          transition: background-color 0.3s, transform 0.2s;
+          /* For animation */
+          opacity: 0;
+          transform: translateY(15px);
+          animation: result-fade-in 0.4s ease forwards;
+      }
+
+      @keyframes result-fade-in {
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
+
+      .search-result-item:hover {
+          background-color: var(--primary-color);
+          transform: scale(1.02);
+      }
+      
+      .search-result-item .cover-image {
+          width: 40px;
+          height: 60px;
+          object-fit: cover;
+          border-radius: 4px;
+          flex-shrink: 0;
+      }
+
+      .search-result-item .result-info .author {
+          font-size: 0.85rem;
+          color: #a0aec0;
+      }
+
+      .search-result-item:hover .result-info .author {
+          color: #e2e8f0;
+      }
+      /* --- END OF ENHANCED STYLES --- */
+
+
+      /* Responsive adjustments */
+      @media (max-width: 767px) {
+        #lens-search-btn {
+          width: 40px;
+          height: 40px;
+          font-size: 1.2rem;
+        }
+        #lens-search-overlay {
+          padding: 1rem;
+          padding-top: 5vh;
+        }
+        #lens-search-box {
+          padding: 1.5rem;
+        }
+        #lens-search-input {
+          font-size: 1rem;
+        }
+        #lens-search-results {
+          max-height: 200px;
+        }
+      }
+
+      .glow-animated-title {
+        font-size: 2.7rem;
+        font-family: "Montserrat", "Poppins", sans-serif;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
+        position: relative;
+      }
+      .glow-title-text {
+        display: inline-block;
+        background: linear-gradient(90deg, #6366f1 0%, #ec4899 50%, #06b6d4 100%);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        filter: drop-shadow(0 0 16px #6366f1cc) drop-shadow(0 0 32px #ec4899aa);
+        animation: glow-move 3.5s linear infinite;
+      }
+      @keyframes glow-move {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      .glow-underline {
+        width: 120px;
+        height: 6px;
+        border-radius: 3px;
+        margin: 0 auto 0.5rem auto;
+        background: linear-gradient(90deg, #6366f1, #ec4899, #06b6d4);
+        box-shadow: 0 0 16px #6366f1cc, 0 0 32px #ec4899aa;
+        animation: underline-glow 2.5s ease-in-out infinite alternate;
+      }
+      @keyframes underline-glow {
+        0% {
+          box-shadow: 0 0 16px #6366f1cc, 0 0 32px #ec4899aa;
+        }
+        100% {
+          box-shadow: 0 0 32px #ec4899cc, 0 0 48px #6366f1aa;
+        }
+      }
+
+      /* Slider styles */
+      .slider-container {
+        position: relative;
+        max-width: 100vw;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+      .slider-track {
+        display: flex;
+        gap: 2rem;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        padding: 1.5rem 0.5rem;
+        background: linear-gradient(90deg, #23263a 60%, #181a20 100%);
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 40px 0 rgba(36, 37, 42, 0.18);
+        min-width: 0;
+        scrollbar-width: none;
+      }
+      .slider-track::-webkit-scrollbar { display: none; }
+      .slider-arrow {
+        background: linear-gradient(120deg, #6366f1 60%, #ec4899 100%);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px #23263a;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+        z-index: 2;
+      }
+      .slider-arrow:hover {
+        background: linear-gradient(120deg, #ec4899 60%, #6366f1 100%);
+        transform: scale(1.12);
+      }
+      .slider-arrow.left { left: 0; }
+      .slider-arrow.right { right: 0; }
+      @media (max-width: 768px) {
+        .slider-arrow { width: 36px; height: 36px; font-size: 1.1rem; }
+        .slider-track { gap: 1rem; }
+      }
+
+      /* End of styles */
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  </head>
+  <body class="animated-bg">
+    <div id="scroll-progress-bar"></div>
+    <div
+      id="particles-js"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+      "
+    ></div>
+
+    <div id="page-container" class="relative z-10">
+      <header
+        id="main-navbar"
+        class="fixed top-0 left-0 right-0 z-50 glass-effect mx-4 mt-4 transition-transform duration-500 ease-in-out will-change-transform"
+      >
+        <div
+          class="container mx-auto px-6 py-4 flex justify-between items-center"
+        >
+          <a
+            href="#"
+            data-page="home"
+            class="nav-link text-2xl font-bold animated-text-gradient"
+            >LiteraryLens</a
+          >
+          <nav class="hidden md:flex space-x-8 items-center main-nav">
+            <a href="#home" data-page="home" class="nav-link text-gray-300"
+              >Home</a
+            >
+            <a href="#top-books-section" class="nav-link text-gray-300"
+              >Top Rated</a
+            >
+            <a href="#testimonials" class="nav-link text-gray-300"
+              >Testimonials</a
+            >
+            <a href="#about" data-page="about" class="nav-link text-gray-300"
+              >About Us</a
+            >
+            <a
+              href="#"
+              data-page="login"
+              id="login-nav-btn"
+              class="nav-link bg-primary-color hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-lg transition"
+              >Login</a
+            >
+            <button
+              id="lens-search-btn"
+              class="ml-4 btn-animate glass-effect p-3 rounded-full shadow-lg flex items-center justify-center"
+              title="Search books"
+            >
+              <i class="fa fa-search"></i>
+            </button>
+          </nav>
+          <button id="hamburger-btn" class="md:hidden text-gray-300">
+            <i class="fas fa-bars text-2xl"></i>
+          </button>
+        </div>
+      </header>
+
+      <div id="mobile-menu" class="glass-effect">
+        <button id="close-menu-btn" class="text-gray-300">
+          <i class="fas fa-times"></i>
+        </button>
+        <a href="#home" data-page="home" class="nav-link text-gray-200">Home</a>
+        <a href="#top-books-section" class="nav-link text-gray-200"
+          >Top Rated</a
+        >
+        <a href="#testimonials" class="nav-link text-gray-200">Testimonials</a>
+        <a href="#about" data-page="about" class="nav-link text-gray-200"
+          >About Us</a
+        >
+        <a
+          href="#"
+          id="mobile-login-link"
+          data-page="login"
+          class="nav-link bg-primary-color text-white py-2 px-6 rounded-lg"
+          >Login</a
+        >
+      </div>
+
+      <main id="main-content">
+        <div id="home" class="page active">
+          <section
+            class="hero-section min-h-screen flex items-center justify-center text-center px-4"
+          >
+            <div class="hero-background"></div>
+            <div class="relative z-10">
+              <h1
+                id="hero-title"
+                class="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white mb-4"
+              >
+                Discover Your Next Favorite Book
+              </h1>
+              <p
+                id="hero-subtitle"
+                class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-8"
+              >
+                Explore authentic, reader-driven feedback and ratings. Find
+                hidden gems and share your own literary journey.
+              </p>
+              <a
+                href="#top-books-section"
+                class="nav-link bg-secondary-color hover:bg-opacity-80 text-white font-bold py-3 px-8 rounded-full transition-transform transform hover:scale-105 inline-block"
+              >
+                Explore Top 10
+              </a>
+            </div>
+          </section>
+          <section id="top-books-section" class="py-10 md:py-20">
+            <div class="flex flex-col items-center mb-6 md:mb-12">
+              <h2 class="glow-animated-title">
+                <span class="glow-title-text">✨ Top Rated Books ✨</span>
+              </h2>
+              <div class="glow-underline"></div>
+            </div>
+            <div id="top-books-outer-container">
+              <div id="top-books-container"></div>
+              <div class="scroll-gradient left" id="left-gradient"></div>
+              <div class="scroll-gradient right" id="right-gradient"></div>
+              <button
+                class="scroll-arrow left glass-effect"
+                id="scroll-left-btn"
+              >
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button
+                class="scroll-arrow right glass-effect"
+                id="scroll-right-btn"
+              >
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </section>
+          <section id="testimonials" class="py-20 bg-opacity-20 bg-black">
+            <div class="container mx-auto px-4">
+              <h2
+                class="text-4xl font-bold text-center mb-12 animated-text-gradient"
+              >
+                What Our Readers Say
+              </h2>
+              <div
+                id="testimonials-container"
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              ></div>
+            </div>
+          </section>
+        </div>
+
+        <div id="detail" class="page">
+          <div class="container mx-auto px-4 pt-32 pb-20">
+            <div id="book-detail-content"></div>
+            <div class="mt-16">
+              <h3 class="text-3xl font-bold mb-8 animated-text-gradient">
+                Reader Feedback
+              </h3>
+              <div id="comments-container" class="space-y-8"></div>
+            </div>
+            <div class="mt-16" id="feedback-section">
+              <div id="feedback-form-container">
+                <h3 class="text-3xl font-bold mb-8 animated-text-gradient">
+                  Leave Your Feedback
+                </h3>
+                <form
+                  id="feedback-form"
+                  class="glass-effect p-8 rounded-lg"
+                  style="display: none"
+                >
+                  <div class="mb-6">
+                    <label class="block text-gray-300 mb-2">Your Rating</label>
+                    <div
+                      class="rating-stars flex flex-row-reverse justify-end items-center"
+                    >
+                      <input
+                        type="radio"
+                        id="star5"
+                        name="rating"
+                        value="5"
+                        required
+                      /><label for="star5" title="5 stars"
+                        ><i class="fas fa-star"></i
+                      ></label>
+                      <input
+                        type="radio"
+                        id="star4"
+                        name="rating"
+                        value="4"
+                      /><label for="star4" title="4 stars"
+                        ><i class="fas fa-star"></i
+                      ></label>
+                      <input
+                        type="radio"
+                        id="star3"
+                        name="rating"
+                        value="3"
+                      /><label for="star3" title="3 stars"
+                        ><i class="fas fa-star"></i
+                      ></label>
+                      <input
+                        type="radio"
+                        id="star2"
+                        name="rating"
+                        value="2"
+                      /><label for="star2" title="2 stars"
+                        ><i class="fas fa-star"></i
+                      ></label>
+                      <input
+                        type="radio"
+                        id="star1"
+                        name="rating"
+                        value="1"
+                      /><label for="star1" title="1 star"
+                        ><i class="fas fa-star"></i
+                      ></label>
+                    </div>
+                  </div>
+                  <div class="mb-6">
+                    <label for="comment" class="block text-gray-300 mb-2"
+                      >Your Comment</label
+                    >
+                    <textarea
+                      id="comment"
+                      rows="5"
+                      class="w-full bg-gray-900 bg-opacity-50 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary-color transition"
+                      required
+                    ></textarea>
+                  </div>
+                  <div class="flex justify-center">
+                    <button
+                      type="submit"
+                      class="bg-gradient-to-r from-secondary-color via-pink-500 to-primary-color text-white font-bold py-3 px-10 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 hover:bg-gradient-to-l hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-secondary-color/40"
+                      style="
+                        background-size: 200% 200%;
+                        background-position: left;
+                      "
+                      onmouseover="this.style.backgroundPosition='right'"
+                      onmouseout="this.style.backgroundPosition='left'"
+                    >
+                      Submit Feedback
+                    </button>
+                  </div>
+                </form>
+                <div id="login-prompt" class="glass-effect p-8 text-center">
+                  <p class="text-lg text-gray-300 mb-4">
+                    You must be logged in to leave feedback.
+                  </p>
+                  <a
+                    href="#"
+                    data-page="login"
+                    class="nav-link bg-primary-color hover:bg-opacity-80 text-white font-bold py-3 px-6 rounded-lg transition"
+                    >Login to Comment</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="login" class="page">
+          <div class="auth-page">
+            <div class="auth-form-container">
+              <form id="login-form" class="glass-effect p-10 space-y-6">
+                <h2
+                  class="text-3xl font-bold text-center text-white animated-text-gradient"
+                >
+                  Member Login
+                </h2>
+                <div class="relative">
+                  <i
+                    class="fas fa-user absolute top-3 left-4 text-gray-400"
+                  ></i>
+                  <input
+                    type="text"
+                    id="login-username"
+                    placeholder="Username"
+                    class="w-full bg-gray-900 bg-opacity-50 border border-gray-700 rounded-lg py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary-color transition"
+                    required
+                  />
+                </div>
+                <div class="relative">
+                  <i
+                    class="fas fa-lock absolute top-3 left-4 text-gray-400"
+                  ></i>
+                  <input
+                    type="password"
+                    id="login-password"
+                    placeholder="Password"
+                    class="w-full bg-gray-900 bg-opacity-50 border border-gray-700 rounded-lg py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary-color transition"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  class="w-full bg-primary-color hover:bg-opacity-80 text-white font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105"
+                >
+                  Secure Login
+                </button>
+                <p class="text-center text-sm text-gray-400">
+                  Don't have an account?
+                  <a
+                    href="#"
+                    data-page="signup"
+                    class="nav-link text-secondary-color hover:underline"
+                    >Sign Up</a
+                  >
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div id="signup" class="page">
+          <div class="auth-page">
+            <div class="auth-form-container">
+              <form id="signup-form" class="glass-effect p-10 space-y-6">
+                <h2
+                  class="text-3xl font-bold text-center text-white animated-text-gradient"
+                >
+                  Create Account
+                </h2>
+                <div class="relative">
+                  <i
+                    class="fas fa-user-plus absolute top-3 left-4 text-gray-400"
+                  ></i>
+                  <input
+                    type="text"
+                    id="signup-username"
+                    placeholder="Choose a Username"
+                    class="w-full bg-gray-900 bg-opacity-50 border border-gray-700 rounded-lg py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary-color transition"
+                    required
+                  />
+                </div>
+                <div class="relative">
+                  <i
+                    class="fas fa-envelope absolute top-3 left-4 text-gray-400"
+                  ></i>
+                  <input
+                    type="email"
+                    id="signup-email"
+                    placeholder="Enter your Email"
+                    class="w-full bg-gray-900 bg-opacity-50 border border-gray-700 rounded-lg py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary-color transition"
+                    required
+                  />
+                </div>
+                <div class="relative">
+                  <i
+                    class="fas fa-lock absolute top-3 left-4 text-gray-400"
+                  ></i>
+                  <input
+                    type="password"
+                    id="signup-password"
+                    placeholder="Create a Password"
+                    class="w-full bg-gray-900 bg-opacity-50 border border-gray-700 rounded-lg py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary-color transition"
+                    required
+                  />
+                </div>
+                <div class="relative">
+                  <i
+                    class="fas fa-check-circle absolute top-3 left-4 text-gray-400"
+                  ></i>
+                  <input
+                    type="password"
+                    id="signup-confirm-password"
+                    placeholder="Confirm Password"
+                    class="w-full bg-gray-900 bg-opacity-50 border border-gray-700 rounded-lg py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary-color transition"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  class="w-full bg-secondary-color hover:bg-opacity-80 text-white font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105"
+                >
+                  Create Account
+                </button>
+                <p class="text-center text-sm text-gray-400">
+                  Already have an account?
+                  <a
+                    href="#"
+                    data-page="login"
+                    class="nav-link text-primary-color hover:underline"
+                    >Login</a
+                  >
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div id="about" class="page">
+          <div class="container mx-auto px-4 pt-32 pb-20">
+            <h1
+              class="text-5xl font-extrabold text-center mb-8 animated-text-gradient headline-animate"
+            >
+              About Us
+            </h1>
+            <div
+              class="glass-effect p-8 rounded-xl max-w-3xl mx-auto text-lg text-gray-200 shadow-xl"
+            >
+              <h2
+                class="text-3xl font-extrabold mb-4 animated-text-gradient"
+                style="
+                  letter-spacing: -0.02em;
+                  text-shadow: 0 2px 12px #ec489988, 0 1px 0 #fff;
+                "
+              >
+                <span class="font-bold text-secondary-color">Who Are We?</span>
+              </h2>
+              <p class="mb-6">
+                We are
+                <span class="font-extrabold text-secondary-color">BookLens</span
+                >, a passionate team of book lovers, technologists, and
+                designers dedicated to building a modern, community-driven
+                platform for discovering, reviewing, and celebrating books. Our
+                diverse backgrounds in literature, software engineering, and
+                digital design empower us to create a space where every reader’s
+                voice matters.
+              </p>
+              <h2
+                class="text-3xl font-extrabold mb-4 animated-text-gradient"
+                style="
+                  letter-spacing: -0.02em;
+                  text-shadow: 0 2px 12px #6366f188, 0 1px 0 #fff;
+                "
+              >
+                <span class="font-bold text-primary-color">Our Mission</span>
+              </h2>
+              <p class="mb-6">
+                To connect readers worldwide, foster authentic conversations
+                about books, and empower everyone to share their literary
+                journeys. We believe in the power of honest feedback, beautiful
+                design, and a welcoming community to inspire a lifelong love of
+                reading.
+              </p>
+              <h2
+                class="text-3xl font-extrabold mb-4 animated-text-gradient"
+                style="
+                  letter-spacing: -0.02em;
+                  text-shadow: 0 2px 12px #ec489988, 0 1px 0 #fff;
+                "
+              >
+                <span class="font-bold text-pink-400">Our Vision</span>
+              </h2>
+              <p>
+                We envision BookLens as the go-to destination for book
+                discovery, trusted reviews, and creative engagement. By blending
+                technology, design, and community, we aim to make reading more
+                social, accessible, and inspiring for all.
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="edit-comment-modal" class="modal-overlay">
+      <div class="modal-content glass-effect">
+        <h3 class="text-3xl font-bold mb-8 animated-text-gradient text-center">
+          Edit Your Feedback
+        </h3>
+        <form id="edit-feedback-form">
+          <input type="hidden" id="edit-book-id" />
+          <input type="hidden" id="edit-comment-index" />
+          <div class="mb-6">
+            <label class="block text-gray-300 mb-2">Your Rating</label>
+            <div
+              id="edit-rating-stars"
+              class="rating-stars flex flex-row-reverse justify-end items-center"
+            >
+              <input
+                type="radio"
+                id="edit-star5"
+                name="edit-rating"
+                value="5"
+                required
+              /><label for="edit-star5" title="5 stars"
+                ><i class="fas fa-star"></i
+              ></label>
+              <input
+                type="radio"
+                id="edit-star4"
+                name="edit-rating"
+                value="4"
+              /><label for="edit-star4" title="4 stars"
+                ><i class="fas fa-star"></i
+              ></label>
+              <input
+                type="radio"
+                id="edit-star3"
+                name="edit-rating"
+                value="3"
+              /><label for="edit-star3" title="3 stars"
+                ><i class="fas fa-star"></i
+              ></label>
+              <input
+                type="radio"
+                id="edit-star2"
+                name="edit-rating"
+                value="2"
+              /><label for="edit-star2" title="2 stars"
+                ><i class="fas fa-star"></i
+              ></label>
+              <input
+                type="radio"
+                id="edit-star1"
+                name="edit-rating"
+                value="1"
+              /><label for="edit-star1" title="1 star"
+                ><i class="fas fa-star"></i
+              ></label>
+            </div>
+          </div>
+          <div class="mb-6">
+            <label for="edit-comment-text" class="block text-gray-300 mb-2"
+              >Your Comment</label
+            >
+            <textarea
+              id="edit-comment-text"
+              rows="5"
+              class="w-full bg-gray-900 bg-opacity-50 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary-color transition"
+              required
+            ></textarea>
+          </div>
+          <div class="flex gap-4">
+            <button
+              type="button"
+              id="cancel-edit-btn"
+              class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="w-full bg-secondary-color hover:bg-opacity-80 text-white font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="message-modal" class="modal-overlay">
+      <div class="modal-content glass-effect text-center p-8">
+        <p id="message-text" class="text-lg mb-6"></p>
+        <button
+          id="message-ok-btn"
+          class="bg-primary-color hover:bg-opacity-80 text-white font-bold py-2 px-8 rounded-lg transition"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+
+    <div id="confirm-modal" class="modal-overlay">
+      <div class="modal-content glass-effect text-center p-8">
+        <p id="confirm-text" class="text-lg mb-8"></p>
+        <div class="flex gap-4">
+          <button
+            id="confirm-no-btn"
+            class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg transition"
+          >
+            Cancel
+          </button>
+          <button
+            id="confirm-yes-btn"
+            class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="fancy-loader">
+      <div class="loader-content">
+        <div class="loader-logo">
+          <i class="fa fa-book-open"></i>
+        </div>
+        <div class="loader-bar">
+          <div class="loader-bar-inner"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="lens-search-overlay">
+      <div id="lens-search-box">
+        <i id="lens-search-close" class="fas fa-times close-btn"></i>
+        <input
+          type="text"
+          id="lens-search-input"
+          placeholder="Search for books by title..."
+        />
+        <ul id="lens-search-results">
+          </ul>
+      </div>
+    </div>
+
+    <svg
+      id="svg-divider-1"
+      viewBox="0 0 1440 120"
+      class="w-full"
+      style="margin-bottom: -2px"
+    >
+      <path
+        fill="#6366f1"
+        fill-opacity="0.18"
+        d="M0,64L48,74.7C96,85,192,107,288,117.3C384,128,480,128,576,112C672,96,768,64,864,53.3C960,43,1056,53,1152,69.3C1248,85,1344,107,1392,117.3L1440,128L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
+      ></path>
+    </svg>
+    <div
+      id="lottie-success"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 99999;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.2);
+      "
+    >
+      <lottie-player
+        src="https://assets2.lottiefiles.com/packages/lf20_jbrw3hcz.json"
+        background="transparent"
+        speed="1"
+        style="width: 300px; height: 300px"
+        loop="false"
+        autoplay
+      ></lottie-player>
+    </div>
+    <div
+      id="live-search-container"
+      class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50"
+      style="display: none"
+    >
+      <input
+        id="live-search"
+        type="text"
+        placeholder="Search books..."
+        class="px-6 py-3 rounded-full shadow-lg border-2 border-primary-color focus:outline-none focus:ring-2 focus:ring-secondary-color w-80"
+      />
+      <ul
+        id="search-suggestions"
+        class="bg-white text-gray-900 rounded-lg shadow-lg mt-2 max-h-60 overflow-y-auto"
+        style="display: none"
+      ></ul>
+    </div>
+    <div
+      id="user-avatar-status"
+      class="fixed top-8 right-8 z-50 flex items-center gap-2"
+      style="display: none"
+    >
+      <img
+        id="user-avatar-img"
+        src="https://placehold.co/48x48/bae6fd/0284c7?text=U"
+        class="rounded-full border-2 border-primary-color shadow-md w-12 h-12 animate-avatar-glow"
+      />
+      <span
+        id="user-status-dot"
+        class="block w-3 h-3 rounded-full bg-green-400 animate-pulse"
+      ></span>
+    </div>
+    <svg
+      id="progress-circle-template"
+      width="48"
+      height="48"
+      viewBox="0 0 48 48"
+      style="display: none"
+    >
+      <circle
+        cx="24"
+        cy="24"
+        r="20"
+        stroke="#6366f1"
+        stroke-width="6"
+        fill="none"
+        opacity="0.18"
+      />
+      <circle
+        class="progress-bar"
+        cx="24"
+        cy="24"
+        r="20"
+        stroke="#ec4899"
+        stroke-width="6"
+        fill="none"
+        stroke-linecap="round"
+        stroke-dasharray="125.6"
+        stroke-dashoffset="125.6"
+      />
+    </svg>
+    <button
+      id="easter-egg-trigger"
+      style="
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 32px;
+        height: 32px;
+        opacity: 0.1;
+        z-index: 99999;
+        background: none;
+        border: none;
+      "
+    ></button>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        let currentUser = null;
+        let lastVisitedPage = { page: "home", bookId: null };
+        let usersDb = [
+          {
+            username: "testuser",
+            email: "test@example.com",
+            password: "password123",
+          },
+        ];
+        const books = [
+          {
+            id: 1,
+            title: "To Kill a Mockingbird",
+            author: "Harper Lee",
+            rating: 4.8,
+            cover: "images/To Kill a Mockingbird.jpg",
+          },
+          {
+            id: 2,
+            title: "1984",
+            author: "George Orwell",
+            rating: 4.7,
+            cover: "images/1984.jpg",
+          },
+          {
+            id: 3,
+            title: "The Great Gatsby",
+            author: "F. Scott Fitzgerald",
+            rating: 4.6,
+            cover: "images/The Great Gatsby.jpg",
+          },
+          {
+            id: 4,
+            title: "Pride and Prejudice",
+            author: "Jane Austen",
+            rating: 4.9,
+            cover: "images/Pride and Prejudice.jpg",
+          },
+          {
+            id: 5,
+            title: "The Catcher in the Rye",
+            author: "J.D. Salinger",
+            rating: 4.5,
+            cover: "images/The Catcher in the Rye.jpg",
+          },
+          {
+            id: 6,
+            title: "The Lord of the Rings",
+            author: "J.R.R. Tolkien",
+            rating: 4.9,
+            cover: "images/The Lord of the Rings.jpg",
+          },
+          {
+            id: 7,
+            title: "The Hobbit",
+            author: "J.R.R. Tolkien",
+            rating: 4.8,
+            cover: "images/The Hobbit.jpg",
+          },
+        ];
+        const testimonials = [
+          {
+            text: "This platform is a game-changer!",
+            author: "Alice Johnson",
+            avatar: "https://placehold.co/100x100/e9d5ff/8b5cf6?text=A",
+          },
+          {
+            text: "A beautiful and intuitive website.",
+            author: "David Chen",
+            avatar: "https://placehold.co/100x100/bae6fd/0284c7?text=D",
+          },
+          {
+            text: "A book review site that feels modern and alive.",
+            author: "Maria Garcia",
+            avatar: "https://placehold.co/100x100/fecdd3/be123c?text=M",
+          },
+        ];
+        let comments = {
+          1: [
+            {
+              author: "ReaderOne",
+              rating: 5,
+              text: "An absolute masterpiece.",
+            },
+            {
+              author: "Bookworm22",
+              rating: 4,
+              text: "Powerful story with timeless themes.",
+            },
+          ],
+          2: [
+            {
+              author: "CriticGuy",
+              rating: 5,
+              text: "Chillingly relevant even today.",
+            },
+          ],
+          3: [
+            {
+              author: "GatsbyFan",
+              rating: 4,
+              text: "Beautiful prose, but ultimately a very sad story.",
+            },
+            {
+              author: "testuser",
+              rating: 5,
+              text: "This is my comment, I should be able to edit it.",
+            },
+          ],
+        };
+
+        const pages = document.querySelectorAll(".page");
+        const navLinks = document.querySelectorAll(".nav-link");
+        const loginForm = document.getElementById("login-form");
+        const signupForm = document.getElementById("signup-form");
+        const loginNavBtn = document.getElementById("login-nav-btn");
+        const mobileLoginLink = document.getElementById("mobile-login-link");
+        const commentsContainer = document.getElementById("comments-container");
+        const topBooksContainer = document.getElementById(
+          "top-books-container"
+        );
+        const testimonialsContainer = document.getElementById(
+          "testimonials-container"
+        );
+        const bookDetailContainer = document.getElementById(
+          "book-detail-content"
+        );
+        const feedbackForm = document.getElementById("feedback-form");
+        const loginPrompt = document.getElementById("login-prompt");
+        const editModal = document.getElementById("edit-comment-modal");
+        const editForm = document.getElementById("edit-feedback-form");
+        const cancelEditBtn = document.getElementById("cancel-edit-btn");
+        const progressBar = document.getElementById("scroll-progress-bar");
+        const messageModal = document.getElementById("message-modal");
+        const messageText = document.getElementById("message-text");
+        const messageOkBtn = document.getElementById("message-ok-btn");
+        const confirmModal = document.getElementById("confirm-modal");
+        const confirmText = document.getElementById("confirm-text");
+        const confirmYesBtn = document.getElementById("confirm-yes-btn");
+        const confirmNoBtn = document.getElementById("confirm-no-btn");
+        let confirmCallback = null;
+
+        function showMessage(text, isError = false) {
+          messageText.textContent = text;
+          messageText.className = `text-lg mb-6 ${
+            isError ? "text-red-400" : "text-gray-200"
+          }`;
+          messageModal.classList.add("visible");
+        }
+        function hideMessage() {
+          messageModal.classList.remove("visible");
+        }
+        function showConfirmation(text, onConfirm) {
+          confirmText.textContent = text;
+          confirmCallback = onConfirm;
+          confirmModal.classList.add("visible");
+        }
+        function hideConfirmation() {
+          confirmModal.classList.remove("visible");
+          confirmCallback = null;
+        }
+        const updateAuthState = () => {
+          if (currentUser) {
+            loginNavBtn.textContent = "Logout";
+            loginNavBtn.dataset.page = "logout";
+            mobileLoginLink.textContent = "Logout";
+            mobileLoginLink.dataset.page = "logout";
+            feedbackForm.style.display = "block";
+            loginPrompt.style.display = "none";
+          } else {
+            loginNavBtn.textContent = "Login";
+            loginNavBtn.dataset.page = "login";
+            mobileLoginLink.textContent = "Login";
+            mobileLoginLink.dataset.page = "login";
+            feedbackForm.style.display = "none";
+            loginPrompt.style.display = "block";
+          }
+        };
+
+        const renderHomePage = () => {
+          topBooksContainer.innerHTML = "";
+          books.forEach((book, index) => {
+            const bookCard = document.createElement("div");
+            bookCard.className =
+              "book-card glass-effect rounded-lg shadow-lg overflow-hidden cursor-pointer";
+            bookCard.dataset.bookId = book.id;
+            bookCard.innerHTML = `<img src="${book.cover}" alt="${book.title}" class="w-full h-full object-cover"><div class="book-card-details"><h3 class="font-bold text-lg text-white">${book.title}</h3><p class="text-sm text-gray-300">${book.author}</p><div class="flex items-center mt-2"><span class="text-yellow-400 font-bold">${book.rating}</span><i class="fas fa-star text-yellow-400 ml-1"></i></div></div>`;
+            bookCard.addEventListener("click", () =>
+              handleCardClick(book.id, bookCard)
+            );
+            bookCard.addEventListener("mousemove", handleMouseMove);
+            bookCard.addEventListener("mouseleave", handleMouseLeave);
+            topBooksContainer.appendChild(bookCard);
+          });
+          testimonialsContainer.innerHTML = "";
+          testimonials.forEach((testimonial) => {
+            const card = document.createElement("div");
+            card.className = `testimonial-card glass-effect p-8`;
+            card.innerHTML = `<p class="text-gray-300 italic mb-6 relative z-10">"${testimonial.text}"</p><div class="flex items-center relative z-10"><div class="avatar-glow"><img src="${testimonial.avatar}" alt="${testimonial.author}" class="w-16 h-16 rounded-full mr-4 border-2 border-secondary-color"></div><div><p class="font-bold text-white">${testimonial.author}</p><p class="text-sm text-primary-color font-semibold">Verified Reader</p></div></div>`;
+            testimonialsContainer.appendChild(card);
+          });
+        };
+
+        const renderBookDetail = (bookId) => {
+          const book = books.find((b) => b.id === bookId);
+          if (!book) return;
+          bookDetailContainer.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center"><div class="md:col-span-1"><img id="detail-page-cover" src="${book.cover}" alt="${book.title}" class="rounded-lg shadow-2xl w-full"></div><div class="md:col-span-1"><h1 class="text-4xl md:text-5xl font-extrabold text-white">${book.title}</h1><p class="text-xl text-gray-400 mt-2 mb-6">by ${book.author}</p><div class="flex items-center space-x-4 mb-6"><div class="flex items-center text-2xl"><span class="text-yellow-400 font-bold">${book.rating}</span><i class="fas fa-star text-yellow-400 ml-2"></i></div><span class="text-gray-400">based on community feedback</span></div><p class="text-gray-300 leading-relaxed">${book.description || 'No description available.'}</p></div></div>`;
+          renderComments(bookId);
+          feedbackForm.dataset.bookId = bookId;
+        };
+        const renderComments = (bookId) => {
+          commentsContainer.innerHTML = "";
+          const bookComments = comments[bookId] || [];
+          if (bookComments.length === 0) {
+            commentsContainer.innerHTML = `<div class="glass-effect p-8 text-center text-gray-400">Be the first to leave a review for this book!</div>`;
+            return;
+          }
+          bookComments.forEach((comment, index) => {
+            const commentCard = document.createElement("div");
+            commentCard.className = "comment-card glass-effect p-6";
+            let stars = Array.from(
+              { length: 5 },
+              (_, i) =>
+                `<i class="fas fa-star ${
+                  i < comment.rating ? "text-secondary-color" : "text-gray-600"
+                }"></i>`
+            ).join("");
+            let userControls = "";
+            if (currentUser && currentUser.username === comment.author) {
+              userControls = `<div class="flex items-center gap-4"><button class="edit-comment-btn text-gray-400 hover:text-white transition" data-book-id="${bookId}" data-comment-index="${index}" title="Edit comment"><i class="fas fa-pencil-alt"></i></button><button class="delete-comment-btn text-gray-400 hover:text-red-500 transition" data-book-id="${bookId}" data-comment-index="${index}" title="Delete comment"><i class="fas fa-trash-alt"></i></button></div>`;
+            }
+            commentCard.innerHTML = `<div class="flex justify-between items-start mb-4"><div><p class="font-bold text-white text-lg">${comment.author}</p><div class="flex mt-1">${stars}</div></div>${userControls}</div><p class="text-gray-300">${comment.text}</p>`;
+            commentsContainer.appendChild(commentCard);
+          });
+        };
+        const navigateTo = (pageId, bookId = null) => {
+          const activePage = document.querySelector(".page.active");
+          if (
+            activePage &&
+            activePage.id !== "login" &&
+            activePage.id !== "signup"
+          ) {
+            lastVisitedPage = {
+              page: activePage.id,
+              bookId: bookId || lastVisitedPage.bookId,
+            };
+          }
+          pages.forEach((p) => p.classList.remove("active"));
+          const targetPage = document.getElementById(pageId);
+          if (targetPage) {
+            targetPage.classList.add("active");
+            window.scrollTo(0, 0);
+          }
+          if (pageId === "home") {
+            renderHomePage();
+            initScrollAnimations();
+          } else if (pageId === "detail" && bookId) {
+            renderBookDetail(bookId);
+          }
+          updateAuthState();
+        };
+        const openEditModal = (bookId, commentIndex) => {
+          const comment = comments[bookId][commentIndex];
+          document.getElementById("edit-book-id").value = bookId;
+          document.getElementById("edit-comment-index").value = commentIndex;
+          document.getElementById("edit-comment-text").value = comment.text;
+          document.querySelector(
+            `input[name="edit-rating"][value="${comment.rating}"]`
+          ).checked = true;
+          editModal.classList.add("visible");
+        };
+        const closeEditModal = () => {
+          editModal.classList.remove("visible");
+          editForm.reset();
+        };
+        const initScrollAnimations = () => {
+          const scrollElements = document.querySelectorAll(".scroll-reveal");
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add("visible");
+                  observer.unobserve(entry.target);
+                }
+              });
+            },
+            { threshold: 0.1 }
+          );
+          scrollElements.forEach((el) => {
+            el.classList.remove("visible");
+            observer.observe(el);
+          });
+        };
+
+        function handleMouseMove(e) {
+          if (e.target.closest(".book-card").classList.contains("no-hover"))
+            return;
+          const card = e.currentTarget;
+          const { left, top, width, height } = card.getBoundingClientRect();
+          const x = e.clientX - left;
+          const y = e.clientY - top;
+          const rotateX = (-1 * (height / 2 - y)) / 20;
+          const rotateY = (width / 2 - x) / 20;
+          card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+          const img = card.querySelector("img");
+          if (img) {
+            img.style.transform = `scale(1.1) translateX(${
+              rotateY * -1
+            }px) translateY(${rotateX * -1}px)`;
+          }
+        }
+        function handleMouseLeave(e) {
+          const card = e.currentTarget;
+          card.style.transform = `rotateX(0) rotateY(0)`;
+          const img = card.querySelector("img");
+          if (img) {
+            img.style.transform = `scale(1)`;
+          }
+        }
+
+        const blob1 = document.getElementById("blob1");
+        const blob2 = document.getElementById("blob2");
+        window.addEventListener("mousemove", (e) => {
+          const { clientX, clientY } = e;
+          if (blob1)
+            blob1.style.transform = `translate(${
+              clientX - blob1.offsetWidth / 2
+            }px, ${clientY - blob1.offsetHeight / 2}px)`;
+          if (blob2)
+            blob2.style.transform = `translate(${
+              clientX - blob2.offsetWidth / 2
+            }px, ${clientY - blob2.offsetHeight / 2}px)`;
+        });
+
+        const leftGradient = document.getElementById("left-gradient");
+        const rightGradient = document.getElementById("right-gradient");
+        const scrollLeftBtn = document.getElementById("scroll-left-btn");
+        const scrollRightBtn = document.getElementById("scroll-right-btn");
+
+        const updateHorizontalScrollUI = () => {
+          const maxScrollLeft =
+            topBooksContainer.scrollWidth - topBooksContainer.clientWidth;
+          leftGradient.style.opacity =
+            topBooksContainer.scrollLeft > 5 ? "1" : "0";
+          rightGradient.style.opacity =
+            topBooksContainer.scrollLeft < maxScrollLeft - 5 ? "1" : "0";
+        };
+        topBooksContainer.addEventListener("scroll", updateHorizontalScrollUI);
+        scrollLeftBtn.addEventListener("click", () => {
+          topBooksContainer.scrollBy({ left: -400, behavior: "smooth" });
+        });
+        scrollRightBtn.addEventListener("click", () => {
+          topBooksContainer.scrollBy({ left: 400, behavior: "smooth" });
+        });
+        let isDown = false,
+          startX,
+          scrollLeft;
+        topBooksContainer.addEventListener("mousedown", (e) => {
+          isDown = true;
+          topBooksContainer.classList.add("active-drag");
+          startX = e.pageX - topBooksContainer.offsetLeft;
+          scrollLeft = topBooksContainer.scrollLeft;
+        });
+        topBooksContainer.addEventListener("mouseleave", () => {
+          isDown = false;
+          topBooksContainer.classList.remove("active-drag");
+        });
+        topBooksContainer.addEventListener("mouseup", () => {
+          isDown = false;
+          topBooksContainer.classList.remove("active-drag");
+        });
+        topBooksContainer.addEventListener("mousemove", (e) => {
+          if (!isDown) return;
+          e.preventDefault();
+          const x = e.pageX - topBooksContainer.offsetLeft;
+          const walk = (x - startX) * 2;
+          topBooksContainer.scrollLeft = scrollLeft - walk;
+        });
+
+        function animateText(element) {
+          if (!element || element.dataset.animated) return;
+          const text = element.innerText;
+          element.innerHTML = "";
+          element.classList.add("reveal-text-container");
+          text.split("").forEach((char, index) => {
+            const span = document.createElement("span");
+            span.textContent = char === " " ? "\u00A0" : char;
+            span.style.animationDelay = `${index * 0.03}s`;
+            element.appendChild(span);
+          });
+          element.dataset.animated = "true";
+        }
+
+        const mobileMenu = document.getElementById("mobile-menu");
+        document
+          .getElementById("hamburger-btn")
+          .addEventListener("click", () => mobileMenu.classList.add("open"));
+        document
+          .getElementById("close-menu-btn")
+          .addEventListener("click", () => mobileMenu.classList.remove("open"));
+
+        navLinks.forEach((link) => {
+          link.addEventListener("click", (e) => {
+            const pageId = link.getAttribute("data-page");
+            const anchor = link.getAttribute("href");
+            mobileMenu.classList.remove("open");
+            if (pageId) {
+              e.preventDefault();
+              if (pageId === "logout") {
+                currentUser = null;
+                const currentPage = document.querySelector(".page.active");
+                const currentBookId =
+                  currentPage.id === "detail" ? lastVisitedPage.bookId : null;
+                navigateTo(currentPage.id, currentBookId);
+                return;
+              }
+              navigateTo(pageId, null);
+            } else if (anchor && anchor.startsWith("#")) {
+              const homePage = document.getElementById("home");
+              if (!homePage.classList.contains("active")) {
+                e.preventDefault();
+                navigateTo("home");
+                setTimeout(() => {
+                  document
+                    .querySelector(anchor)
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }, 100);
+              }
+            }
+          });
+        });
+        loginForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const username = document
+            .getElementById("login-username")
+            .value.trim();
+          const password = document.getElementById("login-password").value;
+          const user = usersDb.find(
+            (u) => u.username === username && u.password === password
+          );
+          if (user) {
+            currentUser = { username: user.username };
+            loginForm.reset();
+            navigateTo(lastVisitedPage.page, lastVisitedPage.bookId);
+          } else {
+            showMessage("Invalid username or password.", true);
+          }
+        });
+        signupForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const username = document
+            .getElementById("signup-username")
+            .value.trim();
+          const email = document.getElementById("signup-email").value.trim();
+          const password = document.getElementById("signup-password").value;
+          const confirmPassword = document.getElementById(
+            "signup-confirm-password"
+          ).value;
+          if (!username || !email || !password) {
+            showMessage("Please fill out all fields.", true);
+            return;
+          }
+          if (password !== confirmPassword) {
+            showMessage("Passwords do not match.", true);
+            return;
+          }
+          if (usersDb.find((u) => u.username === username)) {
+            showMessage(
+              "Username is already taken. Please choose another.",
+              true
+            );
+            return;
+          }
+          if (usersDb.find((u) => u.email === email)) {
+            showMessage("An account with this email already exists.", true);
+            return;
+          }
+          const newUser = { username, email, password };
+          usersDb.push(newUser);
+          currentUser = { username: newUser.username };
+          showMessage("Account created successfully! You are now logged in.");
+          signupForm.reset();
+          navigateTo(lastVisitedPage.page, lastVisitedPage.bookId);
+        });
+        feedbackForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          if (!currentUser) return;
+          const bookId = parseInt(feedbackForm.dataset.bookId);
+          const ratingInput = document.querySelector(
+            'input[name="rating"]:checked'
+          );
+          const commentText = document.getElementById("comment").value;
+          if (!ratingInput || !commentText.trim()) {
+            showMessage("Please provide a rating and a comment.", true);
+            return;
+          }
+          const newComment = {
+            author: currentUser.username,
+            rating: parseInt(ratingInput.value),
+            text: commentText,
+          };
+          if (!comments[bookId]) comments[bookId] = [];
+          comments[bookId].unshift(newComment);
+          renderComments(bookId);
+          feedbackForm.reset();
+        });
+        commentsContainer.addEventListener("click", function (e) {
+          const editBtn = e.target.closest(".edit-comment-btn");
+          if (editBtn) {
+            const bookId = parseInt(editBtn.dataset.bookId);
+            const commentIndex = parseInt(editBtn.dataset.commentIndex);
+            openEditModal(bookId, commentIndex);
+          }
+          const deleteBtn = e.target.closest(".delete-comment-btn");
+          if (deleteBtn) {
+            const bookId = parseInt(deleteBtn.dataset.bookId);
+            const commentIndex = parseInt(deleteBtn.dataset.commentIndex);
+            showConfirmation(
+              "Are you sure you want to delete this comment?",
+              () => {
+                comments[bookId].splice(commentIndex, 1);
+                renderComments(bookId);
+              }
+            );
+          }
+        });
+        editForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+          const bookId = parseInt(
+            document.getElementById("edit-book-id").value
+          );
+          const commentIndex = parseInt(
+            document.getElementById("edit-comment-index").value
+          );
+          const ratingInput = document.querySelector(
+            'input[name="edit-rating"]:checked'
+          );
+          const newText = document.getElementById("edit-comment-text").value;
+          if (!ratingInput || !newText.trim()) {
+            showMessage("Please provide a rating and a comment.", true);
+            return;
+          }
+          comments[bookId][commentIndex] = {
+            author: currentUser.username,
+            rating: parseInt(ratingInput.value),
+            text: newText,
+          };
+          closeEditModal();
+          renderComments(bookId);
+        });
+        cancelEditBtn.addEventListener("click", closeEditModal);
+        messageOkBtn.addEventListener("click", hideMessage);
+        confirmNoBtn.addEventListener("click", hideConfirmation);
+        confirmYesBtn.addEventListener("click", () => {
+          if (typeof confirmCallback === "function") {
+            confirmCallback();
+          }
+          hideConfirmation();
+        });
+
+        const heroBg = document.querySelector(".hero-background");
+        window.addEventListener("scroll", () => {
+          if (document.getElementById("home").classList.contains("active")) {
+            if (heroBg)
+              heroBg.style.transform = `translateY(${
+                window.pageYOffset * 0.4
+              }px)`;
+          }
+          const scrollTop =
+            document.documentElement.scrollTop || document.body.scrollTop;
+          const scrollHeight =
+            document.documentElement.scrollHeight -
+            document.documentElement.clientHeight;
+          const scrollPercentage =
+            scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+          progressBar.style.width = scrollPercentage + "%";
+        });
+
+        function handleCardClick(bookId, cardElement) {
+          const coverImage = cardElement.querySelector("img");
+          const startRect = coverImage.getBoundingClientRect();
+
+          const clone = coverImage.cloneNode(true);
+          clone.id = "transition-clone";
+          clone.style.position = "fixed";
+          clone.style.left = `${startRect.left}px`;
+          clone.style.top = `${startRect.top}px`;
+          clone.style.width = `${startRect.width}px`;
+          clone.style.height = `${startRect.height}px`;
+          document.body.appendChild(clone);
+
+          cardElement.style.opacity = 0;
+
+          navigateTo("detail", bookId);
+
+          setTimeout(() => {
+            const detailPageCover =
+              document.getElementById("detail-page-cover");
+            if (!detailPageCover) {
+              clone.remove();
+              cardElement.style.opacity = 1;
+              return;
+            }
+
+            const endRect = detailPageCover.getBoundingClientRect();
+            detailPageCover.style.opacity = 0;
+
+            clone.style.left = `${endRect.left}px`;
+            clone.style.top = `${endRect.top}px`;
+            clone.style.width = `${endRect.width}px`;
+            clone.style.height = `${endRect.height}px`;
+            clone.style.borderRadius = "0.5rem";
+
+            clone.addEventListener(
+              "transitionend",
+              () => {
+                detailPageCover.style.opacity = 1;
+                clone.remove();
+                cardElement.style.opacity = 1;
+              },
+              { once: true }
+            );
+          }, 50);
+        }
+
+        navigateTo("home");
+        animateText(document.getElementById("hero-title"));
+        animateText(document.getElementById("hero-subtitle"));
+
+        // Particles.js configuration
+        if (typeof particlesJS !== "undefined") {
+          particlesJS("particles-js", {
+            particles: {
+              number: { value: 80, density: { enable: true, value_area: 800 } },
+              color: { value: "#ffffff" },
+              shape: {
+                type: "circle",
+                stroke: { width: 0, color: "#000000" },
+                polygon: { nb_sides: 5 },
+              },
+              opacity: {
+                value: 0.5,
+                random: false,
+                anim: {
+                  enable: false,
+                  speed: 1,
+                  opacity_min: 0.1,
+                  sync: false,
+                },
+              },
+              size: {
+                value: 3,
+                random: true,
+                anim: { enable: false, speed: 40, size_min: 0.1, sync: false },
+              },
+              line_linked: {
+                enable: true,
+                distance: 150,
+                color: "#ffffff",
+                opacity: 0.4,
+                width: 1,
+              },
+              move: {
+                enable: true,
+                speed: 2,
+                direction: "none",
+                random: false,
+                straight: false,
+                out_mode: "out",
+                bounce: false,
+                attract: { enable: false, rotateX: 600, rotateY: 1200 },
+              },
+            },
+            interactivity: {
+              detect_on: "canvas",
+              events: {
+                onhover: { enable: true, mode: "repulse" },
+                onclick: { enable: true, mode: "push" },
+                resize: true,
+              },
+              modes: {
+                grab: { distance: 400, line_linked: { opacity: 1 } },
+                bubble: {
+                  distance: 400,
+                  size: 40,
+                  duration: 2,
+                  opacity: 8,
+                  speed: 3,
+                },
+                repulse: { distance: 200, duration: 0.4 },
+                push: { particles_nb: 4 },
+                remove: { particles_nb: 2 },
+              },
+            },
+            retina_detect: true,
+          });
+        }
+        
+        // AOS initialization
+        if (typeof AOS !== "undefined") {
+          AOS.init({
+            duration: 800,
+            easing: "ease-in-out",
+            once: true,
+          });
+        }
+
+        // --- ENHANCED LENS SEARCH FUNCTIONALITY ---
+        const lensSearchBtn = document.getElementById("lens-search-btn");
+        const lensSearchOverlay = document.getElementById("lens-search-overlay");
+        const lensSearchInput = document.getElementById("lens-search-input");
+        const lensSearchClose = document.getElementById("lens-search-close");
+        const lensSearchResults = document.getElementById("lens-search-results");
+
+        lensSearchBtn.addEventListener("click", () => {
+          lensSearchOverlay.classList.add("visible");
+          lensSearchInput.focus();
+        });
+
+        function closeSearchOverlay() {
+            lensSearchOverlay.classList.remove("visible");
+            // Add a delay to allow the closing animation to finish before clearing
+            setTimeout(() => {
+                lensSearchInput.value = "";
+                lensSearchResults.innerHTML = "";
+            }, 500);
+        }
+
+        lensSearchClose.addEventListener("click", closeSearchOverlay);
+
+        lensSearchOverlay.addEventListener("click", (e) => {
+          if (e.target === lensSearchOverlay) {
+            closeSearchOverlay();
+          }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape' && lensSearchOverlay.classList.contains('visible')) {
+                closeSearchOverlay();
+            }
+        });
+
+
+        lensSearchInput.addEventListener("input", () => {
+          const query = lensSearchInput.value.trim().toLowerCase();
+          lensSearchResults.innerHTML = "";
+          if (!query) return;
+
+          const filteredBooks = books.filter((book) =>
+            book.title.toLowerCase().includes(query) || book.author.toLowerCase().includes(query)
+          );
+
+          if (filteredBooks.length === 0) {
+              lensSearchResults.innerHTML = `<li class="search-result-item text-center text-gray-400">No books found.</li>`;
+              return;
+          }
+
+          filteredBooks.forEach((book, index) => {
+            const li = document.createElement("li");
+            li.className = 'search-result-item';
+            // Stagger the animation
+            li.style.animationDelay = `${index * 0.05}s`;
+            
+            // Richer result HTML
+            li.innerHTML = `
+                <img src="${book.cover}" alt="${book.title}" class="cover-image">
+                <div class="result-info">
+                    <div class="font-bold">${book.title}</div>
+                    <div class="author">by ${book.author}</div>
+                </div>
+            `;
+            
+            li.addEventListener("click", () => {
+              closeSearchOverlay();
+              // Use a timeout to ensure the overlay has started closing before navigating
+              setTimeout(() => {
+                handleCardClick(book.id, document.querySelector(`.book-card[data-book-id='${book.id}']`));
+              }, 100);
+            });
+            lensSearchResults.appendChild(li);
+          });
+        });
+      });
+    </script>
+    <script src="modern-enhancements.js"></script>
+  </body>
+</html>

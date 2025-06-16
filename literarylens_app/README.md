@@ -88,10 +88,5 @@ The app will be available at [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## 📄 License
-
-This project is for educational/demo purposes.
-
----
 
 **Enjoy discovering and sharing your favorite books with LiteraryLens!** 🚀📖✨

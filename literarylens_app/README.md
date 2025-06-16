@@ -3,7 +3,7 @@
 **LiteraryLens** is a modern, community-driven web application for discovering, reviewing, and rating books. It features a beautiful UI, interactive book cards, user authentication, and real-time feedback—all built with Node.js, Express, and a rich HTML/CSS/JS frontend.
 
 ---
-![Website](screenshots/Literarylens.png)
+![Website](Screenshots/Literarylens.png)
 ## ✨ Features
 
 - 🏆 Browse top-rated books with interactive cards and smooth transitions
@@ -16,11 +16,11 @@
 
 ---
 
-![Website](screenshots/Literarylens-login.png)
-![Website](screenshots/Literarylens-signup.png)
-![Website](screenshots/Literarylens-Books.png)
-![Website](screenshots/Literarylens-BookDetails.png)
-![Website](screenshots/Literarylens-BookComments.png)
+![Website](Screenshots/Literarylens-login.png)
+![Website](Screenshots/Literarylens-signup.png)
+![Website](Screenshots/Literarylens-Books.png)
+![Website](Screenshots/Literarylens-BookDetails.png)
+![Website](Screenshots/Literarylens-BookComments.png)
 ## 🗂️ Project Structure
 
 ```

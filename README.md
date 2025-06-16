@@ -26,7 +26,7 @@ The pipeline begins when a developer pushes code to GitHub, triggering Jenkins t
 **LiteraryLens** is a modern, community-driven web application for discovering, reviewing, and rating books. This guide will help you deploy the app using best DevOps practices, including CI/CD, containerization, orchestration, and monitoring.
 
 ---
-![Website](screenshots/Literarylens.png) 
+![Website](Screenshots/Literarylens.png) 
 
 ## 🖥️ Infrastructure Setup
 

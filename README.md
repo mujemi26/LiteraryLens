@@ -3,7 +3,7 @@
 Welcome to the **LiteraryLens** deployment guide! This document provides a step-by-step walkthrough for deploying a Literary Lens App using Docker, Jenkins, Kubernetes (EKS), and monitoring with Prometheus & Grafana.
 
 ---
-![Diagram](screenshots/literarylens-Diagram.png)
+![Diagram](Screenshots/literarylens-Diagram.png)
 The pipeline begins when a developer pushes code to GitHub, triggering Jenkins to start the CI/CD process. Jenkins first runs code quality checks using SonarQube and then performs a security scan of project dependencies using OWASP Dependency Check. If everything passes, Jenkins builds a Docker image of the application, which is then scanned for container vulnerabilities using Trivy. The secure image is deployed to a Kubernetes cluster. Prometheus monitors the application's performance, Grafana visualizes the metrics, and the developer receives email notifications about the pipeline status.
 
 ## 🗂️ Table of Contents
@@ -35,7 +35,7 @@ The pipeline begins when a developer pushes code to GitHub, triggering Jenkins t
 - **OS:** Ubuntu 24.04
 - **Instance Type:** t2.large (28 GB)
 - **Name:** `LS-Server`
-![Website](screenshots/ec2-instances.png) 
+![Website](Screenshots/ec2-instances.png) 
 #### 🔓 Open Required Ports
 
 | Type         | Protocol | Port(s)         | Purpose                                   |
@@ -164,7 +164,7 @@ sudo apt-get install jenkins -y
 ```
 - Open port 8080 for Jenkins.
 - Access Jenkins at `http://<server-ip>:8080`.
-![Website](screenshots/Jenkins-build.png) 
+![Website](Screenshots/Jenkins-build.png) 
 ### 4️⃣ Docker Installation
 
 ```bash
@@ -199,7 +199,7 @@ docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
 ```
 - Access SonarQube at `http://<server-ip>:9000`
 - Default credentials: `admin` / `admin`
-![Website](screenshots/SonarQube-Result.png) 
+![Website](Screenshots/SonarQube-Result.png) 
 ---
 
 ## 🤖 Jenkins Pipeline Setup
@@ -469,7 +469,7 @@ Edit `/etc/prometheus/prometheus.yml` and add:
 - Validate config: `promtool check config /etc/prometheus/prometheus.yml`
 - Reload: `curl -X POST http://localhost:9090/-/reload`
 - Open Prometheus at `http://<monitoring-ip>:9090/targets`
-![Website](screenshots/prometheus.png) 
+![Website](Screenshots/prometheus.png) 
 ### 4️⃣ Grafana Installation
 
 ```bash
@@ -489,9 +489,9 @@ sudo systemctl status grafana-server
   - [Node Exporter Full](https://grafana.com/grafana/dashboards/1860-node-exporter-full/)
   - [Jenkins Performance](https://grafana.com/grafana/dashboards/9964-jenkins-performance-and-health-overview/)
 
-![Website](screenshots/Grafana%20Dashboard.png)
-![Website](screenshots/Grafana%20Jenkins.png)
-![Website](screenshots/Grafana%20Node%20exporter%20.png)   
+![Website](Screenshots/Grafana%20Dashboard.png)
+![Website](Screenshots/Grafana%20Jenkins.png)
+![Website](Screenshots/Grafana%20Node%20exporter%20.png)   
 ---
 
 ## 📬 Email Integration
@@ -515,10 +515,10 @@ kubectl get pods
 kubectl get svc
 kubectl get deployments
 ```
-![Website](screenshots/get%20nodes.png)
-![Website](screenshots/get%20pods.png)
-![Website](screenshots/get%20svc.png)
-![Website](screenshots/get%20deployments.png) 
+![Website](Screenshots/get%20nodes.png)
+![Website](Screenshots/get%20pods.png)
+![Website](Screenshots/get%20svc.png)
+![Website](Screenshots/get%20deployments.png) 
 
 
 ---
